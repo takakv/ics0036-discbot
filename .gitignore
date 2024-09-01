@@ -3,3 +3,7 @@
 # Privacy
 .env
 *.txt
+
+# Python
+venv/
+!requirements.txt
