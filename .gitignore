@@ -1,0 +1,5 @@
+.idea/
+
+# Privacy
+.env
+*.txt
