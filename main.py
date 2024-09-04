@@ -80,4 +80,19 @@ async def register(interaction: nextcord.Interaction, token: str):
     await interaction.send(message, ephemeral=True)
 
 
+@bot.slash_command(description="Who am I?", guild_ids=GUILD_IDS)
+async def whoami(interaction: nextcord.Interaction):
+    user_id = interaction.user.id
+    user_datafile = f"{USER_DATA_DIR}/{user_id}.txt"
+
+    if not os.path.isfile(user_datafile):
+        await interaction.send("I don't know :(", ephemeral=True)
+        return
+
+    with open(user_datafile, "r") as f:
+        user_data = f.readlines()
+
+    await interaction.send(user_data[1], ephemeral=True)
+
+
 bot.run(BOT_TOKEN)
