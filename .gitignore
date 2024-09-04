@@ -3,6 +3,8 @@
 # Privacy
 .env
 *.txt
+students.csv
+tokens.csv
 
 # Python
 venv/
