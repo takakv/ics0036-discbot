@@ -21,7 +21,8 @@ if not os.path.isdir(USER_DATA_DIR):
     os.mkdir(USER_DATA_DIR)
 
 import nextcord
-from nextcord.ext import commands
+from nextcord.ext import commands, application_checks
+from nextcord.ext.application_checks import ApplicationMissingPermissions
 
 bot = commands.Bot()
 
@@ -93,6 +94,27 @@ async def whoami(interaction: nextcord.Interaction):
         user_data = f.readlines()
 
     await interaction.send(user_data[1], ephemeral=True)
+
+
+@bot.slash_command(description="Identify the member", guild_ids=GUILD_IDS)
+@application_checks.has_guild_permissions(administrator=True)  # Server integration failsafe
+async def whois(interaction: nextcord.Interaction, user: nextcord.Member):
+    user_datafile = f"{USER_DATA_DIR}/{user.id}.txt"
+
+    if not os.path.isfile(user_datafile):
+        await interaction.send("unknown", ephemeral=True)
+        return
+
+    with open(user_datafile, "r") as f:
+        user_data = f.readlines()
+
+    await interaction.send(user_data[1], ephemeral=True)
+
+
+@whois.error
+async def whois_error(interaction: nextcord.Interaction, error):
+    if isinstance(error, ApplicationMissingPermissions):
+        await interaction.send("Unauthorised", ephemeral=True)
 
 
 bot.run(BOT_TOKEN)
