@@ -1,3 +1,5 @@
+import base64
+
 def validate_string(s: str):
     if s.lower() != s:
         raise RuntimeError("input must only contain lowercase characters")
@@ -34,3 +36,35 @@ class ShiftCipher:
             pt += chr(ord('a') + ((ord(c) - ord('a') - self.key) % 26))
 
         return pt
+
+
+class BShiftCipher:
+    def __init__(self, key: int):
+        self.key = key
+
+    def encrypt(self, pt: bytes) -> bytes:
+        # Bytes are just integers 0 <= x < 256, so we can have a list of
+        # integers which we later convert to an immutable bytes object.
+        # Implementation details really are annoying...
+        ct: list[int] = []
+        # The largest byte value is 255, so you can think of the alphabet as
+        # bytes 0--255. We no longer care about encoding (functions take care of
+        # that), so we can just apply the mod operator.
+        for b in pt:
+            ct.append((b + self.key) % 256)
+
+        return bytes(ct)
+
+    def decrypt(self, ct: bytes) -> bytes:
+        pt: list[int] = []
+        for b in ct:
+            pt.append((b - self.key) % 256)
+
+        return bytes(pt)
+
+    def encrypt_strings(self, pt: str) -> str:
+        return base64.b64encode(self.encrypt(pt.encode())).decode()
+
+    def decrypt_strings(self, ct: str) -> str:
+        return self.decrypt(base64.b64decode(ct, validate=True)).decode()
+

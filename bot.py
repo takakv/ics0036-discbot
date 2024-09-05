@@ -1,7 +1,8 @@
 import os
+import binascii
 from typing import Literal
 
-from algos.shift import ShiftCipher
+from algos.shift import ShiftCipher, BShiftCipher
 
 import jwt
 from jwt.exceptions import DecodeError, ExpiredSignatureError
@@ -75,7 +76,7 @@ async def on_ready():
     print(f"Logged in as {bot.user}")
 
 
-@bot.slash_command(description="Register as a student", guild_ids=GUILD_IDS)
+@bot.slash_command(description="Register as a student.", guild_ids=GUILD_IDS)
 async def register(interaction: nextcord.Interaction, token: str):
     ok, err = await register_user(interaction, token)
     if ok:
@@ -100,7 +101,7 @@ async def whoami(interaction: nextcord.Interaction):
     await interaction.send(user_data[1], ephemeral=True)
 
 
-@bot.slash_command(description="Identify the member", guild_ids=GUILD_IDS)
+@bot.slash_command(description="Identify the member.", guild_ids=GUILD_IDS)
 @application_checks.has_guild_permissions(administrator=True)  # Server integration failsafe
 async def whois(interaction: nextcord.Interaction, user: nextcord.Member):
     user_datafile = f"{USER_DATA_DIR}/{user.id}.txt"
@@ -124,16 +125,16 @@ async def whois_error(interaction: nextcord.Interaction, error):
 MSG_LEN_MAX = 100
 
 
-@bot.slash_command(description="Use the shift cipher", dm_permission=True)
+@bot.slash_command(description="Use the shift cipher.", dm_permission=True)
 async def shift(interaction: nextcord.Interaction,
                 action: Literal["enc", "dec"] = SlashOption(
-                    description="The operation to perform",
+                    description="The operation to perform.",
                     choices=["enc", "dec"]),
                 key: int = SlashOption(
-                    description="The shift key",
+                    description="The shift key.",
                     min_value=0, max_value=26),
                 data: str = SlashOption(
-                    description=f"The plaintext or the ciphertext (max {MSG_LEN_MAX} characters)",
+                    description=f"The plaintext or the ciphertext (max {MSG_LEN_MAX} characters).",
                     max_length=MSG_LEN_MAX)):
     cipher = ShiftCipher(key)
     try:
@@ -148,7 +149,36 @@ async def shift(interaction: nextcord.Interaction,
 
         await interaction.send(res, ephemeral=True)
     except RuntimeError as e:
-        await interaction.send(str(e), ephemeral=True)
+        await interaction.send(f"The {str(e)}!", ephemeral=True)
+
+
+@bot.slash_command(description="Use the binary shift cipher.", dm_permission=True)
+async def bshift(interaction: nextcord.Interaction,
+                 action: Literal["enc", "dec"] = SlashOption(
+                     description="The operation to perform.",
+                     choices=["enc", "dec"]),
+                 key: int = SlashOption(
+                     description="The shift key.",
+                     min_value=0, max_value=255),
+                 data: str = SlashOption(
+                     description=f"The plaintext or the ciphertext (max {MSG_LEN_MAX} characters). "
+                                 "Ciphertexts must be base64-encoded!",
+                     max_length=MSG_LEN_MAX)):
+    cipher = BShiftCipher(key)
+    match action:
+        case "enc":
+            res = cipher.encrypt_strings(data)
+        case "dec":
+            try:
+                res = cipher.decrypt_strings(data)
+            except binascii.Error:
+                await interaction.send("Ciphertext is not a valid base64 string!", ephemeral=True)
+                return
+        case _:
+            await interaction.send(f"Unknown action '{action}'", ephemeral=True)
+            return
+
+    await interaction.send(res, ephemeral=True)
 
 
 bot.run(BOT_TOKEN)
