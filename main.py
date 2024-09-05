@@ -1,4 +1,7 @@
 import os
+from typing import Literal
+
+from algos.shift import ShiftCipher
 
 import jwt
 from jwt.exceptions import DecodeError, ExpiredSignatureError
@@ -23,6 +26,7 @@ if not os.path.isdir(USER_DATA_DIR):
 import nextcord
 from nextcord.ext import commands, application_checks
 from nextcord.ext.application_checks import ApplicationMissingPermissions
+from nextcord import SlashOption
 
 bot = commands.Bot()
 
@@ -115,6 +119,36 @@ async def whois(interaction: nextcord.Interaction, user: nextcord.Member):
 async def whois_error(interaction: nextcord.Interaction, error):
     if isinstance(error, ApplicationMissingPermissions):
         await interaction.send("Unauthorised", ephemeral=True)
+
+
+MSG_LEN_MAX = 100
+
+
+@bot.slash_command(description="Use the shift cipher", dm_permission=True)
+async def shift(interaction: nextcord.Interaction,
+                action: Literal["enc", "dec"] = SlashOption(
+                    description="The operation to perform",
+                    choices=["enc", "dec"]),
+                key: int = SlashOption(
+                    description="The shift key",
+                    min_value=0, max_value=26),
+                data: str = SlashOption(
+                    description=f"The plaintext or the ciphertext (max {MSG_LEN_MAX} characters)",
+                    max_length=MSG_LEN_MAX)):
+    cipher = ShiftCipher(key)
+    try:
+        match action:
+            case "enc":
+                res = cipher.encrypt(data)
+            case "dec":
+                res = cipher.decrypt(data)
+            case _:
+                await interaction.send(f"Unknown action '{action}'", ephemeral=True)
+                return
+
+        await interaction.send(res, ephemeral=True)
+    except RuntimeError as e:
+        await interaction.send(str(e), ephemeral=True)
 
 
 bot.run(BOT_TOKEN)
