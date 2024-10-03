@@ -192,7 +192,8 @@ async def bshift(interaction: nextcord.Interaction,
 async def lpk(interaction: nextcord.Interaction):
     p384 = P384_SK
     pub = p384.public_key()
-    pub_pem = f"```{pub.export_key(format="PEM")}```"
+    # Use singe quotes here since the backticks confuse some interpreters.
+    pub_pem = f'```{pub.export_key(format="PEM")}```'
     await interaction.send(pub_pem, ephemeral=True)
 
 
