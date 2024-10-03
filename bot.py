@@ -1,16 +1,21 @@
 import os
-import binascii
 from typing import Literal
 
-from algos.shift import ShiftCipher, BShiftCipher
-
+import binascii
 import jwt
-from jwt.exceptions import DecodeError, ExpiredSignatureError
+from Crypto.PublicKey import ECC
+from Crypto.PublicKey.ECC import EccKey
 from dotenv import load_dotenv
+from jwt.exceptions import DecodeError, ExpiredSignatureError
+
+from algos.shift import ShiftCipher, BShiftCipher
+from commands.eph_dh import get_ec_keys, fetch_session_key, aes_decrypt
 
 load_dotenv()
 GUILD_IDS = [int(os.getenv("GUILD_ID"))]
 ROLE_ID = int(os.getenv("ROLE_ID"))
+
+KEY_PWD = os.getenv("KEY_PWD")
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 JWT_SECRET = os.getenv("JWT_SECRET")
@@ -30,6 +35,8 @@ from nextcord.ext.application_checks import ApplicationMissingPermissions
 from nextcord import SlashOption
 
 bot = commands.Bot()
+
+P384_SK: EccKey
 
 
 async def register_user(interaction: nextcord.Interaction, token: str) -> tuple[bool, str]:
@@ -181,4 +188,44 @@ async def bshift(interaction: nextcord.Interaction,
     await interaction.send(res, ephemeral=True)
 
 
+@bot.slash_command(description="List public keys.", dm_permission=True)
+async def lpk(interaction: nextcord.Interaction):
+    p384 = P384_SK
+    pub = p384.public_key()
+    pub_pem = f"```{pub.export_key(format="PEM")}```"
+    await interaction.send(pub_pem, ephemeral=True)
+
+
+@bot.slash_command(description="Share AES-128 key with DH and decrypt.", dm_permission=True)
+async def dh_aes(interaction: nextcord.Interaction,
+                 s_key: str = SlashOption(description="Your (long term) public key."),
+                 e_key: str = SlashOption(description="Your ephemeral public key."),
+                 ct: str = SlashOption(description="The AES-128 encrypted message (hex).", max_length=128),
+                 iv: str = SlashOption(description="The AES-128 initialization vector (hex).",
+                                       min_length=32, max_length=32)):
+    try:
+        s_pk, e_pk = await get_ec_keys(interaction, s_key, e_key)
+    except RuntimeError:
+        return
+
+    session_key = fetch_session_key(P384_SK, s_pk, e_pk)
+
+    try:
+        message = await aes_decrypt(interaction, ct, iv, session_key)
+    except RuntimeError:
+        return
+
+    await interaction.send(message, ephemeral=True)
+
+
+def init_keys():
+    global P384_SK
+    with open("p384.pem", "rt") as f:
+        data = f.read()
+        P384_SK = ECC.import_key(data, KEY_PWD)
+
+    print("Private keys initialised!")
+
+
+init_keys()
 bot.run(BOT_TOKEN)
