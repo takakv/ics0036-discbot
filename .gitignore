@@ -3,8 +3,9 @@
 # Privacy
 .env
 *.txt
-students.csv
-tokens.csv
+*.csv
+*.db
+*.pem
 
 # Python
 venv/

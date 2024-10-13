@@ -3,22 +3,17 @@ from typing import Literal
 
 import binascii
 import jwt
-from Crypto.PublicKey import ECC
-from Crypto.PublicKey.ECC import EccKey
 from dotenv import load_dotenv
 from jwt.exceptions import DecodeError, ExpiredSignatureError
 
 from algos.shift import ShiftCipher, BShiftCipher
+from cogs.ElGamalAuthentication import ElGamalAuthentication
 from commands.eph_dh import get_ec_keys, fetch_session_key, aes_decrypt
+from utils.constants import Client, init_keys, Secrets, Keys
 
 load_dotenv()
 GUILD_IDS = [int(os.getenv("GUILD_ID"))]
 ROLE_ID = int(os.getenv("ROLE_ID"))
-
-KEY_PWD = os.getenv("KEY_PWD")
-
-BOT_TOKEN = os.getenv("BOT_TOKEN")
-JWT_SECRET = os.getenv("JWT_SECRET")
 
 USER_DATA_DIR = "userdata"
 USED_TOKENS_FILE = "used_tokens.txt"
@@ -36,12 +31,10 @@ from nextcord import SlashOption
 
 bot = commands.Bot()
 
-P384_SK: EccKey
-
 
 async def register_user(interaction: nextcord.Interaction, token: str) -> tuple[bool, str]:
     # User is already registered, maybe with another token.
-    # By design, ff the user has left the server and rejoins, no automatic
+    # By design, if the user has left the server and rejoins, no automatic
     # or token re-registration is possible!
     user_id = interaction.user.id
     user_datafile = f"{USER_DATA_DIR}/{user_id}.txt"
@@ -50,7 +43,7 @@ async def register_user(interaction: nextcord.Interaction, token: str) -> tuple[
         return False, "You are already registered"
 
     try:
-        data = jwt.decode(token, JWT_SECRET, algorithms="HS256")
+        data = jwt.decode(token, Secrets.JWT_SECRET, algorithms="HS256")
     except (DecodeError, ExpiredSignatureError) as err:
         print(f"User '{user_id}' submitted invalid token '{token}'")
         return False, str(err)
@@ -190,11 +183,11 @@ async def bshift(interaction: nextcord.Interaction,
 
 @bot.slash_command(description="List public keys.", dm_permission=True)
 async def lpk(interaction: nextcord.Interaction):
-    p384 = P384_SK
-    pub = p384.public_key()
+    pub = Keys.P384.public_key()
     # Use singe quotes here since the backticks confuse some interpreters.
     pub_pem = f'```{pub.export_key(format="PEM")}```'
     await interaction.send(pub_pem, ephemeral=True)
+    await interaction.send(Keys.EG.pk, ephemeral=True)
 
 
 @bot.slash_command(description="Share AES-128 key with DH and decrypt.", dm_permission=True)
@@ -209,7 +202,7 @@ async def dh_aes(interaction: nextcord.Interaction,
     except RuntimeError:
         return
 
-    session_key = fetch_session_key(P384_SK, s_pk, e_pk)
+    session_key = fetch_session_key(Keys.P384, s_pk, e_pk)
 
     try:
         message = await aes_decrypt(interaction, ct, iv, session_key)
@@ -219,14 +212,12 @@ async def dh_aes(interaction: nextcord.Interaction,
     await interaction.send(message, ephemeral=True)
 
 
-def init_keys():
-    global P384_SK
-    with open("p384.pem", "rt") as f:
-        data = f.read()
-        P384_SK = ECC.import_key(data, KEY_PWD)
-
-    print("Private keys initialised!")
-
-
 init_keys()
-bot.run(BOT_TOKEN)
+
+from utils import database
+
+database.connect()
+
+bot.add_cog(ElGamalAuthentication(bot))
+
+bot.run(Client.TOKEN)
