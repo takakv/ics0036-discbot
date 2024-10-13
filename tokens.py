@@ -1,6 +1,7 @@
 import csv
 import os
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 from dotenv import load_dotenv
 import jwt
@@ -11,7 +12,7 @@ SECRET = os.getenv("JWT_SECRET")
 
 def get_jwt(name: str, student_code: str) -> str:
     return jwt.encode({
-        "exp": datetime(2024, 9, 10),
+        "exp": datetime(2024, 10, 4, tzinfo=ZoneInfo("Europe/Tallinn")),
         "name": name,
         "studentCode": student_code,
     }, SECRET, algorithm="HS256")
