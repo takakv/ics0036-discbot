@@ -29,7 +29,7 @@ class ElGamalAuthentication(commands.Cog):
         u = int(s[0], 10)
         v = int(s[1], 10)
 
-        await interaction.send(f'```u=\n{u}\nv=\n{v}```')
+        await interaction.send(f'```u=\n{u}\nv=\n{v}```', ephemeral=True)
 
     @authenticate.subcommand(description="Connect to the server.")
     async def connect(self, interaction: Interaction,
