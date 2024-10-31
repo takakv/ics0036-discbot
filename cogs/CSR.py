@@ -62,11 +62,12 @@ class CSR(commands.Cog):
 
         try:
             subprocess.run(["openssl", "x509", "-req",
+                            "-extfile", f"{SERVER_DATA_DIR}/v3.ext",
                             "-CA", f"{SERVER_DATA_DIR}/ca.cert.pem",
                             "-CAkey", f"{SERVER_DATA_DIR}/ca.key.pem",
+                            "-passin", f"pass:{CA_PWD}",
                             "-CAcreateserial", "-sha256",
                             "-days", "1",
-                            "-passin", f"pass:{CA_PWD}",
                             "-in", tempfile,
                             "-out", certfile], check=True, capture_output=True)
         except subprocess.CalledProcessError as e:
