@@ -18,10 +18,10 @@ class CSR(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @slash_command(name="csr",
-                   description="Request a new certificate.",
+    @slash_command(name="req",
+                   description="Request a new TLS client certificate.",
                    dm_permission=True)
-    async def authenticate(self, interaction: Interaction,
+    async def get_tls_cert(self, interaction: Interaction,
                            csr: Attachment = SlashOption(description="The certificate signing request.")):
         user_id = interaction.user.id
         user_datafile = f"{USER_DATA_DIR}/{user_id}.txt"
@@ -62,7 +62,7 @@ class CSR(commands.Cog):
 
         try:
             subprocess.run(["openssl", "x509", "-req",
-                            "-extfile", f"{SERVER_DATA_DIR}/v3.ext",
+                            "-extfile", f"{SERVER_DATA_DIR}/mtls.ext",
                             "-CA", f"{SERVER_DATA_DIR}/ca.cert.pem",
                             "-CAkey", f"{SERVER_DATA_DIR}/ca.key.pem",
                             "-passin", f"pass:{CA_PWD}",
