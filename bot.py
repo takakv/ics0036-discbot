@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from jwt.exceptions import DecodeError, ExpiredSignatureError
 
 from algos.shift import ShiftCipher, BShiftCipher
+from cogs.CSR import CSR
 from cogs.ElGamalAuthentication import ElGamalAuthentication
 from commands.eph_dh import get_ec_keys, fetch_session_key, aes_decrypt
 from utils.constants import Client, init_keys, Secrets, Keys
@@ -219,5 +220,6 @@ from utils import database
 database.connect()
 
 bot.add_cog(ElGamalAuthentication(bot))
+bot.add_cog(CSR(bot))
 
 bot.run(Client.TOKEN)
