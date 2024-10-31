@@ -34,7 +34,7 @@ class CSR(commands.Cog):
             user_data = f.readlines()
 
         legal_name = user_data[0].strip()
-        ttu_id = user_data[1]
+        ttu_id = user_data[1].strip()
         tempfile = f"{ttu_id}.temp"
         certfile = f"{ttu_id}.crt"
 
