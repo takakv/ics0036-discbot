@@ -1,4 +1,5 @@
 import binascii
+import logging
 import os
 from typing import Literal
 
@@ -10,6 +11,8 @@ from src.cogs.ElGamalAuthentication import ElGamalAuthentication
 from src.cogs.account import Account
 from src.commands.eph_dh import get_ec_keys, fetch_session_key, aes_decrypt
 from src.utils.constants import Client, init_keys, Keys
+
+logging.basicConfig(level=logging.INFO)
 
 load_dotenv()
 GUILD_IDS = [int(os.getenv("GUILD_ID"))]
@@ -34,7 +37,7 @@ bot = commands.Bot()
 
 @bot.event
 async def on_ready():
-    print(f"Logged in as {bot.user}")
+    logging.info(f"Logged in as {bot.user}")
 
 
 @bot.slash_command(description="Who am I?", guild_ids=GUILD_IDS)

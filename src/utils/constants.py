@@ -1,3 +1,4 @@
+import logging
 import os
 from typing import NamedTuple
 
@@ -35,4 +36,4 @@ def init_keys():
         secret = int(data, 10)
         Keys.EG = EGSecretKey(secret)
 
-    print("Private keys initialised!")
+    logging.info("Private keys initialised!")

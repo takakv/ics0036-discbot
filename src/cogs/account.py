@@ -1,3 +1,4 @@
+import logging
 import os
 import subprocess
 import tempfile
@@ -119,6 +120,7 @@ class Account(commands.Cog):
 
         token = get_student_token(given_name, surname, idc)
         if token is None:
+            logging.warning(f"Student with CN `{cn}` could not be found")
             await interaction.send(
                 "Could not validate course registration. Send a message to @taka.kv for a code.",
                 ephemeral=True)
@@ -158,6 +160,8 @@ class Account(commands.Cog):
                 ephemeral=True)
             cdoc_path.unlink(missing_ok=True)
             return
+
+        logging.info(f"Issued token '{token}' for user '{interaction.user.id}'")
 
         await interaction.response.send_message(
             "To decrypt your token, you will need your ID card or equivalent, "

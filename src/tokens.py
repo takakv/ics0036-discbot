@@ -21,7 +21,7 @@ def get_jwt(name: str, uni_id: str, student_code: str, id_code: str) -> str:
 
 
 def get_student_token(first_name: str, last_name: str, id_code: str) -> str | None:
-    with open("../students.csv") as sf:
+    with open("students.csv") as sf:
         csv_reader = csv.reader(sf, delimiter=";")
         for row in csv_reader:
             if row[3].lower() == last_name.lower() and row[2].lower() == first_name.lower():
