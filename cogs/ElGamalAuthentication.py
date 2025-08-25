@@ -1,4 +1,4 @@
-from nextcord import slash_command, Interaction, SlashOption
+from nextcord import slash_command, Interaction, SlashOption, IntegrationType
 from nextcord.ext import commands
 from peewee import DoesNotExist
 
@@ -13,7 +13,7 @@ class ElGamalAuthentication(commands.Cog):
 
     @slash_command(name="eg_auth",
                    description="Authenticate using ElGamal.",
-                   dm_permission=True)
+                   integration_types=[IntegrationType.user_install])
     async def authenticate(self, interaction: Interaction):
         pass
 

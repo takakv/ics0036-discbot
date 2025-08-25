@@ -1,7 +1,7 @@
+import binascii
 import os
 from typing import Literal
 
-import binascii
 import jwt
 from dotenv import load_dotenv
 from jwt.exceptions import DecodeError, ExpiredSignatureError
@@ -28,7 +28,7 @@ if not os.path.isdir(USER_DATA_DIR):
 import nextcord
 from nextcord.ext import commands, application_checks
 from nextcord.ext.application_checks import ApplicationMissingPermissions
-from nextcord import SlashOption
+from nextcord import SlashOption, IntegrationType
 
 bot = commands.Bot()
 
@@ -126,7 +126,7 @@ async def whois_error(interaction: nextcord.Interaction, error):
 MSG_LEN_MAX = 100
 
 
-@bot.slash_command(description="Use the shift cipher.", dm_permission=True)
+@bot.slash_command(description="Use the shift cipher.", integration_types=[IntegrationType.user_install])
 async def shift(interaction: nextcord.Interaction,
                 action: Literal["enc", "dec"] = SlashOption(
                     description="The operation to perform.",
@@ -153,7 +153,7 @@ async def shift(interaction: nextcord.Interaction,
         await interaction.send(f"The {str(e)}!", ephemeral=True)
 
 
-@bot.slash_command(description="Use the binary shift cipher.", dm_permission=True)
+@bot.slash_command(description="Use the binary shift cipher.", integration_types=[IntegrationType.user_install])
 async def bshift(interaction: nextcord.Interaction,
                  action: Literal["enc", "dec"] = SlashOption(
                      description="The operation to perform.",
@@ -182,7 +182,7 @@ async def bshift(interaction: nextcord.Interaction,
     await interaction.send(res, ephemeral=True)
 
 
-@bot.slash_command(description="List public keys.", dm_permission=True)
+@bot.slash_command(description="List public keys.", integration_types=[IntegrationType.user_install])
 async def lpk(interaction: nextcord.Interaction):
     pub = Keys.P384.public_key()
     # Use singe quotes here since the backticks confuse some interpreters.
@@ -191,7 +191,7 @@ async def lpk(interaction: nextcord.Interaction):
     await interaction.send(Keys.EG.pk, ephemeral=True)
 
 
-@bot.slash_command(description="Share AES-128 key with DH and decrypt.", dm_permission=True)
+@bot.slash_command(description="Share AES-128 key with DH and decrypt.", integration_types=[IntegrationType.user_install])
 async def dh_aes(interaction: nextcord.Interaction,
                  s_key: str = SlashOption(description="Your (long term) public key."),
                  e_key: str = SlashOption(description="Your ephemeral public key."),

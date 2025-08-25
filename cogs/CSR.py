@@ -4,7 +4,7 @@ import subprocess
 from cryptography import x509
 from cryptography.hazmat._oid import NameOID
 from dotenv import load_dotenv
-from nextcord import slash_command, Interaction, SlashOption, Attachment
+from nextcord import slash_command, Interaction, SlashOption, Attachment, IntegrationType
 from nextcord.ext import commands
 
 USER_DATA_DIR = "userdata"
@@ -20,7 +20,7 @@ class CSR(commands.Cog):
 
     @slash_command(name="req",
                    description="Request a new TLS client certificate.",
-                   dm_permission=True)
+                   integration_types=[IntegrationType.user_install])
     async def get_tls_cert(self, interaction: Interaction,
                            csr: Attachment = SlashOption(description="The certificate signing request.")):
         user_id = interaction.user.id
