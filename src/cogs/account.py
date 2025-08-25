@@ -11,8 +11,8 @@ from jwt import DecodeError, ExpiredSignatureError
 from nextcord import slash_command, Interaction, SlashOption, File
 from nextcord.ext import commands
 
-from tokens import get_student_token
-from utils.constants import Secrets
+from src.tokens import get_student_token
+from src.utils.constants import Secrets
 
 load_dotenv()
 GUILD_IDS = [int(os.getenv("GUILD_ID"))]

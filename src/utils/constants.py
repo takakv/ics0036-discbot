@@ -5,7 +5,7 @@ from Crypto.PublicKey import ECC
 from Crypto.PublicKey.ECC import EccKey
 from dotenv import load_dotenv
 
-from algos.elgamal import EGSecretKey
+from src.algos.elgamal import EGSecretKey
 
 load_dotenv()
 

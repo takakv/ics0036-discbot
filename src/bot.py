@@ -4,19 +4,19 @@ from typing import Literal
 
 from dotenv import load_dotenv
 
-from algos.shift import ShiftCipher, BShiftCipher
-from cogs.CSR import CSR
-from cogs.ElGamalAuthentication import ElGamalAuthentication
-from cogs.account import Account
-from commands.eph_dh import get_ec_keys, fetch_session_key, aes_decrypt
-from utils.constants import Client, init_keys, Keys
+from src.algos.shift import ShiftCipher, BShiftCipher
+from src.cogs.CSR import CSR
+from src.cogs.ElGamalAuthentication import ElGamalAuthentication
+from src.cogs.account import Account
+from src.commands.eph_dh import get_ec_keys, fetch_session_key, aes_decrypt
+from src.utils.constants import Client, init_keys, Keys
 
 load_dotenv()
 GUILD_IDS = [int(os.getenv("GUILD_ID"))]
 ROLE_ID = int(os.getenv("ROLE_ID"))
 
-USER_DATA_DIR = "userdata"
-USED_TOKENS_FILE = "used_tokens.txt"
+USER_DATA_DIR = "../userdata"
+USED_TOKENS_FILE = "../used_tokens.txt"
 
 if not os.path.isfile(USED_TOKENS_FILE):
     open(USED_TOKENS_FILE, "w").close()
@@ -166,7 +166,7 @@ async def dh_aes(interaction: nextcord.Interaction,
 
 init_keys()
 
-from utils import database
+from src.utils import database
 
 database.connect()
 

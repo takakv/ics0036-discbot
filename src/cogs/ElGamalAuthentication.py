@@ -2,9 +2,9 @@ from nextcord import slash_command, Interaction, SlashOption, IntegrationType
 from nextcord.ext import commands
 from peewee import DoesNotExist
 
-from algos.elgamal import EGCiphertext
-from utils.constants import Keys, Secrets
-from utils.database import EGToken
+from src.algos.elgamal import EGCiphertext
+from src.utils.constants import Keys, Secrets
+from src.utils.database import EGToken
 
 
 class ElGamalAuthentication(commands.Cog):
