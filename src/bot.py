@@ -18,8 +18,8 @@ load_dotenv()
 GUILD_IDS = [int(os.getenv("GUILD_ID"))]
 ROLE_ID = int(os.getenv("ROLE_ID"))
 
-USER_DATA_DIR = "../userdata"
-USED_TOKENS_FILE = "../used_tokens.txt"
+USER_DATA_DIR = "userdata"
+USED_TOKENS_FILE = "used_tokens.txt"
 
 if not os.path.isfile(USED_TOKENS_FILE):
     open(USED_TOKENS_FILE, "w").close()

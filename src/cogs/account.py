@@ -120,7 +120,7 @@ class Account(commands.Cog):
 
         token = get_student_token(given_name, surname, idc)
         if token is None:
-            logging.warning(f"Student with CN `{cn}` could not be found")
+            logging.warning(f"Student ({interaction.user.id}) with CN '{cn}' could not be found")
             await interaction.send(
                 "Could not validate course registration. Send a message to @taka.kv for a code.",
                 ephemeral=True)
