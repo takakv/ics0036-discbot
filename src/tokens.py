@@ -25,12 +25,12 @@ def get_student_token(first_name: str, last_name: str, id_code: str) -> str | No
         csv_reader = csv.reader(sf, delimiter=";")
         for row in csv_reader:
             if row[3].lower() == last_name.lower() and row[2].lower() == first_name.lower():
-                return get_jwt(f"{row[2]} {row[3]}", row[2], row[1], id_code)
+                return get_jwt(f"{row[2]} {row[3]}", row[1], row[0], id_code)
     return None
 
 
 def main():
-    with open("../students.csv") as sf, open("tokens.csv", "a") as tf:
+    with open("students.csv") as sf, open("tokens.csv", "a") as tf:
         csv_reader = csv.reader(sf, delimiter=";")
         read_header = False
         for row in csv_reader:
@@ -38,7 +38,7 @@ def main():
                 read_header = True
                 continue
 
-            token = get_jwt(f"{row[2]} {row[3]}", row[2], row[1])
+            token = get_jwt(f"{row[2]} {row[3]}", row[1], row[0], "X")
             tf.write(f"{row[2]} {row[3]};{row[1]};{token}\n")
 
 
