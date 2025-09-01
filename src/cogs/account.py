@@ -102,7 +102,7 @@ class Account(commands.Cog):
         cert_bytes = b""
 
         for dn, entry in res:
-            if "ou=authentication" not in dn.lower() and "o=mobile-id" in dn.lower():
+            if "ou=authentication" not in dn.lower() or "o=mobile-id" in dn.lower():
                 continue
 
             cn = entry.get("cn", [b""])[0].decode()
