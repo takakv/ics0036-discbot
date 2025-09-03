@@ -79,14 +79,15 @@ async def whois_error(interaction: nextcord.Interaction, error):
 MSG_LEN_MAX = 100
 
 
-@bot.slash_command(description="Use the shift cipher.", integration_types=[IntegrationType.user_install])
+@bot.slash_command(description="Use the shift cipher.",
+                   integration_types=[IntegrationType.user_install, IntegrationType.guild_install])
 async def shift(interaction: nextcord.Interaction,
                 action: Literal["enc", "dec"] = SlashOption(
                     description="The operation to perform.",
                     choices=["enc", "dec"]),
                 key: int = SlashOption(
                     description="The shift key.",
-                    min_value=0, max_value=26),
+                    min_value=0, max_value=25),
                 data: str = SlashOption(
                     description=f"The plaintext or the ciphertext (max {MSG_LEN_MAX} characters).",
                     max_length=MSG_LEN_MAX)):
@@ -106,7 +107,8 @@ async def shift(interaction: nextcord.Interaction,
         await interaction.send(f"The {str(e)}!", ephemeral=True)
 
 
-@bot.slash_command(description="Use the binary shift cipher.", integration_types=[IntegrationType.user_install])
+@bot.slash_command(description="Use the binary shift cipher.",
+                   integration_types=[IntegrationType.user_install, IntegrationType.guild_install])
 async def bshift(interaction: nextcord.Interaction,
                  action: Literal["enc", "dec"] = SlashOption(
                      description="The operation to perform.",
