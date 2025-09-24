@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 
 from src.algos.shift import ShiftCipher, BShiftCipher
 from src.cogs.CSR import CSR
+from src.cogs.Challenge import Challenge
 from src.cogs.ElGamalAuthentication import ElGamalAuthentication
 from src.cogs.account import Account
 from src.commands.eph_dh import get_ec_keys, fetch_session_key, aes_decrypt
@@ -178,5 +179,6 @@ database.connect()
 bot.add_cog(ElGamalAuthentication(bot))
 bot.add_cog(CSR(bot))
 bot.add_cog(Account(bot))
+bot.add_cog(Challenge(bot))
 
 bot.run(Client.TOKEN)
