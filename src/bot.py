@@ -10,7 +10,7 @@ from src.cogs.CSR import CSR
 from src.cogs.Challenge import Challenge
 from src.cogs.ElGamalAuthentication import ElGamalAuthentication
 from src.cogs.account import Account
-from src.commands.eph_dh import get_ec_keys, fetch_session_key, aes_decrypt
+from src.cogs.ecdhe import ECDH
 from src.utils.constants import Client, init_keys, Keys
 
 logging.basicConfig(level=logging.INFO)
@@ -138,36 +138,13 @@ async def bshift(interaction: nextcord.Interaction,
     await interaction.send(res, ephemeral=True)
 
 
-@bot.slash_command(description="List public keys.", integration_types=[IntegrationType.user_install])
+@bot.slash_command(description="List public keys.")
 async def lpk(interaction: nextcord.Interaction):
     pub = Keys.P384.public_key()
     # Use singe quotes here since the backticks confuse some interpreters.
     pub_pem = f'```{pub.export_key(format="PEM")}```'
     await interaction.send(pub_pem, ephemeral=True)
     await interaction.send(Keys.EG.pk, ephemeral=True)
-
-
-@bot.slash_command(description="Share AES-128 key with DH and decrypt.",
-                   integration_types=[IntegrationType.user_install])
-async def dh_aes(interaction: nextcord.Interaction,
-                 s_key: str = SlashOption(description="Your (long term) public key."),
-                 e_key: str = SlashOption(description="Your ephemeral public key."),
-                 ct: str = SlashOption(description="The AES-128 encrypted message (hex).", max_length=128),
-                 iv: str = SlashOption(description="The AES-128 initialization vector (hex).",
-                                       min_length=32, max_length=32)):
-    try:
-        s_pk, e_pk = await get_ec_keys(interaction, s_key, e_key)
-    except RuntimeError:
-        return
-
-    session_key = fetch_session_key(Keys.P384, s_pk, e_pk)
-
-    try:
-        message = await aes_decrypt(interaction, ct, iv, session_key)
-    except RuntimeError:
-        return
-
-    await interaction.send(message, ephemeral=True)
 
 
 init_keys()
@@ -180,5 +157,6 @@ bot.add_cog(ElGamalAuthentication(bot))
 bot.add_cog(CSR(bot))
 bot.add_cog(Account(bot))
 bot.add_cog(Challenge(bot))
+bot.add_cog(ECDH(bot))
 
 bot.run(Client.TOKEN)

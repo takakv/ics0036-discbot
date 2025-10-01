@@ -1,6 +1,6 @@
 import base64
-
 import binascii
+
 import nextcord
 from Crypto.Cipher import AES
 from Crypto.Hash import SHAKE128
@@ -52,8 +52,8 @@ async def get_ec_keys(interaction: nextcord.Interaction, s_key: str, e_key: str)
     return user_s_pk, user_e_pk
 
 
-def fetch_session_key(ssk: EccKey, spk: EccKey, epk: EccKey) -> bytes:
-    return key_agreement(static_priv=ssk, static_pub=spk, eph_pub=epk, kdf=kdf)
+def fetch_session_key(ssk: EccKey, spk: EccKey, esk: EccKey, epk: EccKey) -> bytes:
+    return key_agreement(static_priv=ssk, static_pub=spk, eph_priv=esk, eph_pub=epk, kdf=kdf)
 
 
 async def aes_decrypt(interaction: nextcord.Interaction, ct_hex: str, iv_hex: str, key: bytes) -> str:
