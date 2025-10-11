@@ -13,7 +13,7 @@ class ElGamalAuthentication(commands.Cog):
 
     @slash_command(name="eg_auth",
                    description="Authenticate using ElGamal.",
-                   integration_types=[IntegrationType.user_install])
+                   integration_types=[IntegrationType.guild_install])
     async def authenticate(self, interaction: Interaction):
         pass
 
