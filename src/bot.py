@@ -138,7 +138,7 @@ async def bshift(interaction: nextcord.Interaction,
     await interaction.send(res, ephemeral=True)
 
 
-@bot.slash_command(description="List public keys.")
+@bot.slash_command(description="List public keys.", integration_types=[IntegrationType.guild_install])
 async def lpk(interaction: nextcord.Interaction):
     pub = Keys.P384.public_key()
     # Use singe quotes here since the backticks confuse some interpreters.
