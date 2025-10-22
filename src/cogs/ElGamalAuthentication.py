@@ -17,6 +17,10 @@ class ElGamalAuthentication(commands.Cog):
     async def authenticate(self, interaction: Interaction):
         pass
 
+    @authenticate.subcommand(description="Show the public key.")
+    async def pk(self, interaction: Interaction):
+        await interaction.send(Keys.EG.pk, ephemeral=True)
+
     @authenticate.subcommand(description="Show the previous successful token.")
     async def show_token(self, interaction: Interaction):
         try:
