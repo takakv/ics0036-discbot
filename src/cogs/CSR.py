@@ -20,7 +20,7 @@ class CSR(commands.Cog):
 
     @slash_command(name="req",
                    description="Request a new TLS client certificate.",
-                   integration_types=[IntegrationType.user_install])
+                   integration_types=[IntegrationType.user_install, IntegrationType.guild_install])
     async def get_tls_cert(self, interaction: Interaction,
                            csr: Attachment = SlashOption(description="The certificate signing request.")):
         user_id = interaction.user.id
@@ -51,7 +51,7 @@ class CSR(commands.Cog):
 
         subject = csr.subject
         serialised = subject.rfc4514_string({NameOID.EMAIL_ADDRESS: "E"})
-        expected = f"E={ttu_id}@taltech.ee,CN={legal_name},OU=ICS0026,O=TalTech,C=EE"
+        expected = f"C=EE,O=TalTech,OU=ICS0036,CN={legal_name},E={ttu_id}@taltech.ee"
         if serialised != expected:
             await interaction.send(f"Certificate subject should be:\n`{expected}`\nbut was\n`{serialised}`",
                                    ephemeral=True)
@@ -65,9 +65,10 @@ class CSR(commands.Cog):
                             "-extfile", f"{SERVER_DATA_DIR}/mtls.ext",
                             "-CA", f"{SERVER_DATA_DIR}/ca.cert.pem",
                             "-CAkey", f"{SERVER_DATA_DIR}/ca.key.pem",
-                            "-passin", f"pass:{CA_PWD}",
+                            # "-passin", f"pass:{CA_PWD}",
                             "-CAcreateserial", "-sha256",
-                            "-days", "1",
+                            # "-days", "1",
+                            "-not_after", "20260131145959Z",
                             "-in", tempfile,
                             "-out", certfile], check=True, capture_output=True)
         except subprocess.CalledProcessError as e:
