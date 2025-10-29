@@ -51,7 +51,7 @@ class CSR(commands.Cog):
 
         subject = csr.subject
         serialised = subject.rfc4514_string({NameOID.EMAIL_ADDRESS: "E"})
-        expected = f"C=EE,O=TalTech,OU=ICS0036,CN={legal_name},E={ttu_id}@taltech.ee"
+        expected = f"E={ttu_id}@taltech.ee,CN={legal_name},OU=ICS0036,O=TalTech,C=EE"
         if serialised != expected:
             await interaction.send(f"Certificate subject should be:\n`{expected}`\nbut was\n`{serialised}`",
                                    ephemeral=True)
